@@ -1,0 +1,746 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"></head><body>
+<title>CEO for a Day Live</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=Archivo:wght@400;600;800&display=swap">
+<style>
+/* Layout: a quiz-show stage on a brick baseplate. Top bar = progress, centre = the round, bottom = four team bricks + host console. Single dark look by design. */
+:root {
+  --stage: #151b3d;
+  --stage-2: #1f2754;
+  --stage-3: #2a3468;
+  --ink: #f7f4ec;
+  --muted: #aeb5dc;
+  --red: #e2382f;
+  --blue: #2477e0;
+  --yellow: #f6c31c;
+  --green: #22a35a;
+  --gold: #ffd23f;
+  --good: #3ad07a;
+  --bad: #ff6b5e;
+  --display: "Bungee", "Arial Black", Impact, sans-serif;
+  --body: "Archivo", "Segoe UI", system-ui, sans-serif;
+  color-scheme: dark;
+}
+html, body { height: 100%; }
+[hidden] { display: none !important; }
+body {
+  margin: 0;
+  background: var(--stage);
+  background-image: radial-gradient(circle at 12px 12px, rgba(255,255,255,.045) 0 7px, transparent 8px);
+  background-size: 24px 24px;
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 18px;
+  overflow-x: hidden;
+}
+.app {
+  min-height: 100%;
+  box-sizing: border-box;
+  display: grid;
+  grid-template-rows: auto 1fr auto auto;
+  gap: 16px;
+  padding-block: 16px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  grid-template-columns: minmax(0, 1fr);
+  max-width: 1600px;
+  margin: 0 auto;
+}
+button { font-family: inherit; cursor: pointer; }
+button:focus-visible, input:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+
+/* top bar */
+.top { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.brand { font-family: var(--display); font-size: 20px; letter-spacing: .02em; }
+.brand span { color: var(--gold); }
+.progress { display: flex; gap: 6px; flex-wrap: wrap; flex: 1; justify-content: center; }
+.pill { font-size: 13px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; padding: 6px 12px; border-radius: 999px; background: var(--stage-2); color: var(--muted); }
+.pill.on { background: var(--gold); color: var(--stage); }
+.pill.done { color: var(--ink); }
+.hostchip { font-size: 14px; font-weight: 600; color: var(--muted); }
+.hostchip b { color: var(--ink); }
+
+/* stage */
+.stage { min-height: 0; display: grid; }
+.screen.enter { animation: rise .45s ease both; }
+.screen { display: grid; grid-template-columns: minmax(0, 1fr); align-content: center; gap: 24px; }
+@keyframes rise { from { transform: translateY(14px); opacity: .001; } to { transform: none; opacity: 1; } }
+
+.eyebrow { font-size: 15px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--gold); }
+.mega { overflow-wrap: anywhere; font-family: var(--display); font-size: clamp(36px, 7.5vw, 112px); line-height: .95; margin: 0; text-wrap: balance; }
+.mega .y { color: var(--gold); }
+.lede { font-size: clamp(18px, 1.8vw, 26px); color: var(--muted); max-width: 58ch; margin: 0; line-height: 1.4; }
+.rules { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; }
+.rule { background: var(--stage-2); border-radius: 14px; padding: 16px; }
+.rule b { display: block; font-family: var(--display); font-size: 26px; color: var(--gold); }
+.big-btn { font-family: var(--display); font-size: clamp(22px, 2.4vw, 34px); padding: 18px 34px; border: 0; border-radius: 16px; background: var(--gold); color: var(--stage); box-shadow: 0 6px 0 #b48d10; justify-self: start; }
+.big-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #b48d10; }
+
+.stats { display: flex; flex-wrap: wrap; gap: 12px; }
+.stat { background: var(--stage-2); border-radius: 14px; padding: 14px 18px; }
+.stat b { font-family: var(--display); font-size: 30px; color: var(--gold); display: block; }
+
+.namegrid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.namegrid label { display: grid; gap: 6px; font-size: 13px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+.namegrid input { font: 600 20px var(--body); padding: 12px; border-radius: 12px; border: 3px solid var(--c); background: var(--stage-2); color: var(--ink); min-width: 0; }
+
+/* question */
+.qwrap { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 28px; align-items: center; }
+.qcard { display: grid; gap: 18px; }
+.qtext { overflow-wrap: anywhere; font-family: var(--display); font-size: clamp(22px, 3.3vw, 50px); line-height: 1.08; margin: 0; text-wrap: balance; }
+.opts { display: grid; gap: 12px; }
+.opt { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 16px; align-items: center; background: var(--stage-2); border-radius: 16px; padding: 14px 18px; font-size: clamp(18px, 1.9vw, 28px); font-weight: 600; transition: background .3s, opacity .3s, transform .3s; }
+.opt .n { font-family: var(--display); width: 48px; height: 48px; border-radius: 12px; display: grid; place-items: center; background: var(--stage-3); color: var(--gold); font-size: 26px; }
+.opt .who { display: flex; gap: 6px; }
+.opt .who i { width: 18px; height: 18px; border-radius: 5px; background: var(--c); box-shadow: inset 0 -3px 0 rgba(0,0,0,.25); }
+.opt.right { background: var(--good); color: #08240f; transform: scale(1.02); }
+.opt.right .n { background: #0f5a2b; color: #fff; }
+.opt.dim { opacity: .38; }
+.lightning-opts { grid-template-columns: 1fr 1fr; }
+.lightning-opts .opt { font-family: var(--display); font-size: clamp(28px, 3.4vw, 54px); grid-template-columns: auto 1fr auto; }
+
+.ring { position: relative; width: clamp(150px, 15vw, 230px); aspect-ratio: 1; max-width: 100%; }
+.ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.ring .track { fill: none; stroke: var(--stage-2); stroke-width: 12; }
+.ring .bar { fill: none; stroke: var(--gold); stroke-width: 12; stroke-linecap: round; transition: stroke-dashoffset .25s linear, stroke .3s; }
+.ring.hot .bar { stroke: var(--bad); }
+.ring .num { position: absolute; inset: 0; display: grid; place-items: center; font-family: var(--display); font-size: clamp(48px, 5vw, 80px); font-variant-numeric: tabular-nums; }
+.ring .cap { position: absolute; left: 0; right: 0; bottom: 18%; text-align: center; font-size: 13px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.ring.hot .num { color: var(--bad); animation: pulse .5s ease infinite alternate; }
+@keyframes pulse { to { transform: scale(1.08); } }
+
+.screen.enter .fact { animation: rise .4s ease both; }
+.fact { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 16px; align-items: start; background: var(--ink); color: var(--stage); border-radius: 16px; padding: 16px 20px; }
+.fact .tag { font-family: var(--display); font-size: 15px; background: var(--stage); color: var(--gold); padding: 8px 10px; border-radius: 10px; white-space: nowrap; }
+.fact p { margin: 0; font-size: clamp(16px, 1.5vw, 22px); line-height: 1.35; }
+.fact p + p { margin-top: 6px; font-weight: 800; }
+.fact small { display: block; margin-top: 6px; font-size: 13px; color: #4b5280; }
+
+/* teams */
+.teams { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.team { position: relative; background: var(--c); color: #fff; border-radius: 14px; padding: 22px 14px 12px; box-shadow: inset 0 -6px 0 rgba(0,0,0,.22); display: grid; gap: 8px; transition: transform .2s, outline-color .2s; outline: 4px solid transparent; outline-offset: 3px; }
+.team.yel { color: #2b2100; }
+.team::before { content: ""; position: absolute; top: -9px; left: 18%; right: 18%; height: 14px; background: radial-gradient(circle at 25% 50%, var(--c) 0 9px, transparent 10px), radial-gradient(circle at 75% 50%, var(--c) 0 9px, transparent 10px); filter: brightness(1.12); }
+.team.sel { outline-color: var(--ink); transform: translateY(-4px); }
+.team .row { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.team .nm { font-weight: 800; font-size: 17px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.team .sc { font-family: var(--display); font-size: clamp(24px, 2.4vw, 36px); font-variant-numeric: tabular-nums; }
+.team .crown { position: absolute; top: -30px; right: 10px; font-size: 26px; animation: bob 1s ease-in-out infinite alternate; }
+@keyframes bob { to { transform: translateY(-4px) rotate(8deg); } }
+.team .btns { display: flex; gap: 6px; }
+.team .btns button { flex: 1; min-width: 0; font: 800 18px var(--body); padding: 8px 0; border-radius: 10px; border: 2px solid rgba(255,255,255,.55); background: rgba(0,0,0,.18); color: inherit; }
+.team.yel .btns button { border-color: rgba(43,33,0,.45); }
+.team .btns button.on { background: var(--ink); color: var(--stage); border-color: var(--ink); }
+.team .btns button:disabled { cursor: default; opacity: .65; }
+.team .order { position: absolute; top: 6px; left: 10px; font-size: 12px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; opacity: .9; }
+.team .delta { position: absolute; top: -18px; left: 50%; transform: translateX(-50%); font-family: var(--display); font-size: 26px; color: var(--gold); text-shadow: 0 3px 0 rgba(0,0,0,.4); animation: pop 1.6s ease both; white-space: nowrap; }
+@keyframes pop { 0% { opacity: 0; transform: translate(-50%, 10px) scale(.6); } 20% { opacity: 1; transform: translate(-50%, -10px) scale(1.15); } 80% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%, -36px); } }
+
+/* podium */
+.podium { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; align-items: end; max-width: 980px; width: 100%; justify-self: center; }
+.place { display: grid; gap: 10px; justify-items: center; text-align: center; }
+.place .blk { width: 100%; border-radius: 14px 14px 0 0; background: var(--c); display: grid; place-items: center; font-family: var(--display); font-size: clamp(40px, 5vw, 76px); color: rgba(255,255,255,.92); box-shadow: inset 0 -8px 0 rgba(0,0,0,.25); animation: grow .9s cubic-bezier(.2,.9,.3,1.2) both; transform-origin: bottom; }
+@keyframes grow { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+.place .pn { font-weight: 800; font-size: clamp(18px, 2vw, 28px); }
+.place .ps { font-family: var(--display); font-size: clamp(22px, 2.4vw, 34px); color: var(--gold); }
+.also { text-align: center; color: var(--muted); font-size: 18px; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 12px; }
+.chip { background: var(--stage-2); border-radius: 14px; padding: 14px 18px; display: grid; gap: 4px; min-width: 0; }
+.chip b { font-family: var(--display); color: var(--gold); font-size: 22px; }
+
+/* console */
+.console { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; background: var(--stage-2); border-radius: 16px; padding: 10px 12px; }
+.console .say { flex: 1 1 320px; min-width: 0; font-size: 15px; color: var(--muted); line-height: 1.35; }
+.console .say b { color: var(--ink); }
+.cbtn { font-weight: 800; font-size: 15px; padding: 10px 14px; border-radius: 12px; border: 0; background: var(--stage-3); color: var(--ink); }
+.cbtn.primary { background: var(--gold); color: var(--stage); font-size: 17px; padding: 12px 20px; }
+.cbtn:disabled { opacity: .4; cursor: default; }
+.vol { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); }
+.vol input { width: 90px; accent-color: var(--gold); }
+.keys { font-size: 12px; color: var(--muted); width: 100%; }
+kbd { font: 700 11px var(--body); background: var(--stage-3); padding: 2px 6px; border-radius: 5px; color: var(--ink); }
+
+/* phone join */
+.joinwrap { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 28px; align-items: center; }
+.qrcard { background: var(--ink); color: var(--stage); border-radius: 18px; padding: 18px; display: grid; gap: 10px; justify-items: center; text-align: center; width: min(300px, 100%); box-sizing: border-box; }
+.qrcard img { width: 100%; max-width: 240px; height: auto; image-rendering: pixelated; }
+.qrcard .code { font-family: var(--display); font-size: 40px; letter-spacing: .12em; }
+.qrcard .url { font-size: 13px; font-weight: 600; overflow-wrap: anywhere; color: #4b5280; }
+.qrcard .msg { font-size: 15px; font-weight: 800; }
+.netchip { font-size: 13px; font-weight: 800; padding: 6px 10px; border-radius: 999px; background: var(--stage-2); color: var(--muted); }
+.netchip.ok { color: var(--good); }
+.netchip.bad { color: var(--bad); }
+.team .ph { position: absolute; top: 6px; right: 10px; font-size: 12px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; opacity: .9; }
+.team .ph.off { opacity: .5; }
+.urlrow { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-size: 13px; color: var(--muted); }
+.urlrow input { flex: 1 1 260px; min-width: 0; font: 600 14px var(--body); padding: 8px 10px; border-radius: 10px; border: 2px solid var(--stage-3); background: var(--stage-2); color: var(--ink); }
+
+#confetti { position: fixed; inset: 0; pointer-events: none; z-index: 50; width: 100%; height: 100%; }
+
+@media (max-width: 760px) {
+  .qwrap, .joinwrap { grid-template-columns: minmax(0, 1fr); }
+  .ring { justify-self: center; }
+  .teams, .namegrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .lightning-opts { grid-template-columns: 1fr; }
+  .keys { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before { animation: none !important; transition: none !important; }
+}
+</style>
+
+<div class="app" id="app">
+  <header class="top">
+    <div class="brand">CEO for a Day <span>·</span> The Brick Crisis</div>
+    <nav class="progress" id="progress" aria-label="Game progress"></nav>
+    <div class="netchip" id="netchip">Phones: connecting…</div>
+    <div class="hostchip" id="hostchip"></div>
+  </header>
+  <main class="stage" id="stage" aria-live="polite"></main>
+  <section class="teams" id="teams" aria-label="Team scores"></section>
+  <footer class="console" id="console">
+    <div class="say" id="say"></div>
+    <button class="cbtn" id="btnBack" type="button">◂ Back</button>
+    <button class="cbtn" id="btnUndo" type="button">Undo</button>
+    <button class="cbtn primary" id="btnNext" type="button">Next ▸</button>
+    <button class="cbtn" id="btnMute" type="button">Mute</button>
+    <label class="vol" for="vol">Vol <input id="vol" type="range" min="0" max="1" step="0.05" value="0.8"></label>
+    <button class="cbtn" id="btnFull" type="button">Full screen</button>
+    <div class="keys"><kbd>Space</kbd> next · <kbd>←</kbd> back · <kbd>R</kbd><kbd>B</kbd><kbd>Y</kbd><kbd>G</kbd> pick team, then <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> answer · <kbd>U</kbd> undo · <kbd>M</kbd> mute · <kbd>S</kbd> skip rest of lightning · <kbd>F</kbd> full screen</div>
+  </footer>
+</div>
+<canvas id="confetti" aria-hidden="true"></canvas>
+<div id="qrtmp" hidden></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+
+<script>
+(() => {
+  // ---------- content (every fact is from the Group 5 deck's verified sources) ----------
+  const Q = [
+    { tag: "KA11 · Decide", round: "Round 1 · Decide", host: "Ahmad", time: 20,
+      q: "LEGO is doing too many things at once: theme parks, video games, jewelry, education centers. What do you do?",
+      opts: ["Launch even more new products to find a hit", "Cut back and focus on the core brick", "Wait for the market to recover"],
+      correct: 1,
+      fact: "LEGO sold 70% of its Legoland parks (€375m), closed plants and cut complexity. It was back to profit in 2005: DKK 505m.",
+      theory: "Escalation of commitment: stop paying for an idea just because you started it.",
+      src: "Knowledge at Wharton (2012); AP via NBC News (15 Feb 2006)",
+      ask: "<b>Ahmad:</b> “Every team is LEGO’s new CEO. Your company is doing too many things at once. Spokespeople, get your phones ready!”" },
+    { tag: "KA12 · Influence", round: "Round 2 · Influence", host: "Hung", time: 20,
+      q: "You need new product ideas, fast. Who do you ask?",
+      opts: ["Only your top managers", "An outside agency", "Your adult fans, before a prototype even exists"],
+      correct: 2,
+      fact: "LEGO invited adult fans to help design the Mindstorms NXT robot before a working prototype existed. It launched in 2006.",
+      theory: "Consultation builds commitment. Sharing power multiplies ideas.",
+      src: "RobotShop/Wired (2006)",
+      ask: "<b>Hung:</b> “The bank account is empty and you need ideas, fast. Who do you ask? Tap fast!”" },
+    { tag: "KA13 · Lead", round: "Round 3 · Lead", host: "Sandra", time: 20,
+      q: "Your people are scared. How do you lead them now?",
+      opts: ["Strict control: tell everyone exactly what to do", "“I don’t want to control. I want to create context.”", "Stay in the background and let teams sort it out"],
+      correct: 1,
+      fact: "These are the words of Jørgen Vig Knudstorp, the CEO who led LEGO’s turnaround from 2004 to 2017.",
+      theory: "Give purpose and support, not fear. Passive leadership leaves people alone in a crisis.",
+      src: "Freeland, BCG interview with Knudstorp (2017)",
+      ask: "<b>Sandra:</b> “Last decision, CEOs. Your people are scared. How do you lead them?”" },
+    { tag: "Lightning · ×2", host: "Hung", time: 10, lightning: true,
+      q: "Managers were afraid of their bosses, so bad news never reached the top.",
+      opts: ["LEGO", "Nokia"], correct: 1,
+      fact: "Vuori & Huy studied Nokia’s smartphone decline: shared fear made managers hide bad news.",
+      theory: "Fear-based power creates silence.",
+      src: "Vuori & Huy (2016), Administrative Science Quarterly 61(1)",
+      ask: "<b>Hung:</b> “LEGO or Nokia? Tap it. Ten seconds!”" },
+    { tag: "Lightning · ×2", host: "Hung", time: 10, lightning: true,
+      q: "A fan’s product idea needs 10,000 supporters before the company reviews it.",
+      opts: ["LEGO", "Nokia"], correct: 0,
+      fact: "LEGO Ideas: if a fan’s set is made, the fan earns 1% of its net revenue.",
+      theory: "Crowdsourcing turns customers into co-creators.",
+      src: "Kinicki & Fugate (2021), p. 356",
+      ask: "<b>Hung:</b> “Next one. LEGO or Nokia?”" },
+    { tag: "Lightning · ×2", host: "Hung", time: 10, lightning: true,
+      q: "It sold its phone business to Microsoft in 2013.",
+      opts: ["LEGO", "Nokia"], correct: 1,
+      fact: "The €5.44bn deal came two years after the famous “burning platform” memo.",
+      theory: "When ideas stop flowing up, the company runs out of options.",
+      src: "Reuters via Bangor Daily News (3 Sep 2013)",
+      ask: "<b>Hung:</b> “Who sold its phones to Microsoft?”" },
+    { tag: "Lightning · ×2", host: "Sandra", time: 10, lightning: true,
+      q: "It opened a solar-powered factory in Vietnam in 2025.",
+      opts: ["LEGO", "Nokia"], correct: 0,
+      fact: "Binh Duong, Vietnam: over US$1bn invested and 12,400 rooftop solar panels.",
+      theory: "The next crisis is environmental, and it needs the same creative leadership.",
+      src: "Viet Nam Government News (10 Apr 2025)",
+      ask: "<b>Sandra:</b> “Last one, and it’s in ASEAN. LEGO or Nokia?”" },
+  ];
+  const TEAMS = [
+    { id: "R", key: "r", label: "Red", c: "var(--red)", cls: "" },
+    { id: "B", key: "b", label: "Blue", c: "var(--blue)", cls: "" },
+    { id: "Y", key: "y", label: "Yellow", c: "var(--yellow)", cls: "yel" },
+    { id: "G", key: "g", label: "Green", c: "var(--green)", cls: "" },
+  ];
+  const STEPS = [
+    { s: "start", pill: "Start", host: "Ahmad" },
+    { s: "teams", pill: "Teams", host: "Ahmad" },
+    { s: "q", i: 0, pill: "R1" }, { s: "q", i: 1, pill: "R2" }, { s: "q", i: 2, pill: "R3" },
+    { s: "lintro", pill: "Lightning", host: "Hung" },
+    { s: "q", i: 3, pill: "L1" }, { s: "q", i: 4, pill: "L2" }, { s: "q", i: 5, pill: "L3" }, { s: "q", i: 6, pill: "L4" },
+    { s: "podium", pill: "Podium", host: "Sandra" },
+    { s: "bridge", pill: "Slides", host: "Sandra" },
+  ];
+
+  // ---------- state ----------
+  let state = { step: 0, phase: "ask", names: { R: "Red Team", B: "Blue Team", Y: "Yellow Team", G: "Green Team" }, answers: {}, revealed: {}, sel: null, muted: false, vol: 0.8 };
+  let undoStack = [];
+  let timer = { left: 0, dur: 0, id: null, t0: 0, lastTick: null };
+  let lastDelta = null, lastKey = "";
+
+  const $ = (id) => document.getElementById(id);
+  const esc = (t) => String(t).replace(/[&<>"]/g, (m) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[m]));
+
+  // ---------- scoring ----------
+  function delta(qi) {
+    const q = Q[qi], a = state.answers[qi] || {}, out = {};
+    const right = TEAMS.filter((t) => a[t.id] && a[t.id].o === q.correct);
+    let first = null;
+    right.forEach((t) => { if (!first || a[t.id].t < a[first].t) first = t.id; });
+    TEAMS.forEach((t) => {
+      let p = 0;
+      if (right.includes(t)) p = (q.lightning ? 200 : 100) + (t.id === first ? (q.lightning ? 100 : 50) : 0);
+      out[t.id] = { p, first: t.id === first };
+    });
+    return out;
+  }
+  function scores() {
+    const sc = { R: 0, B: 0, Y: 0, G: 0 };
+    Object.keys(state.revealed).forEach((qi) => { const d = delta(+qi); TEAMS.forEach((t) => (sc[t.id] += d[t.id].p)); });
+    return sc;
+  }
+
+  // ---------- audio (all synthesized; no files) ----------
+  const A = { ctx: null, master: null, music: null, sfx: null, noise: null, tempo: 124, step: 0, next: 0, id: null, mood: "off" };
+  const mf = (m) => 440 * Math.pow(2, (m - 69) / 12);
+  function audioInit() {
+    if (A.ctx) { if (A.ctx.state === "suspended") A.ctx.resume(); return; }
+    const C = window.AudioContext || window.webkitAudioContext;
+    if (!C) return;
+    A.ctx = new C();
+    A.master = A.ctx.createGain(); A.master.gain.value = state.muted ? 0 : state.vol; A.master.connect(A.ctx.destination);
+    A.music = A.ctx.createGain(); A.music.gain.value = 0.55; A.music.connect(A.master);
+    A.sfx = A.ctx.createGain(); A.sfx.gain.value = 0.9; A.sfx.connect(A.master);
+    const len = A.ctx.sampleRate * 2; A.noise = A.ctx.createBuffer(1, len, A.ctx.sampleRate);
+    const d = A.noise.getChannelData(0); for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+  }
+  function env(g, t, a, peak, dec) { g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(peak, t + a); g.gain.exponentialRampToValueAtTime(0.0001, t + a + dec); }
+  function tone(type, f, t, dur, peak, dest, f2) {
+    const o = A.ctx.createOscillator(), g = A.ctx.createGain();
+    o.type = type; o.frequency.setValueAtTime(f, t); if (f2) o.frequency.exponentialRampToValueAtTime(f2, t + dur);
+    env(g, t, 0.005, peak, dur); o.connect(g); g.connect(dest || A.sfx); o.start(t); o.stop(t + dur + 0.05);
+  }
+  function noise(t, dur, peak, type, freq, dest, q) {
+    const s = A.ctx.createBufferSource(), f = A.ctx.createBiquadFilter(), g = A.ctx.createGain();
+    s.buffer = A.noise; f.type = type; f.frequency.value = freq; if (q) f.Q.value = q;
+    env(g, t, 0.003, peak, dur); s.connect(f); f.connect(g); g.connect(dest || A.sfx);
+    s.start(t, Math.random() * 1.5); s.stop(t + dur + 0.05);
+  }
+  // music: Am – F – C – G, four-on-the-floor
+  const PROG = [[57, 60, 64], [53, 57, 60], [55, 60, 64], [55, 59, 62]];
+  const BASS = [33, 29, 36, 31];
+  const ARP = { 0: 0, 3: 1, 6: 2, 8: 1, 11: 2, 14: 0 };
+  function playStep(st, t) {
+    const bar = Math.floor(st / 16) % 4, s = st % 16, light = A.mood === "lightning";
+    if (s % 4 === 0) tone("sine", 150, t, 0.22, 0.9, A.music, 45);
+    if (s === 4 || s === 12) noise(t, 0.14, 0.35, "bandpass", 1800, A.music, 0.8);
+    if (s % 2 === 1 || light) noise(t, 0.035, light ? 0.09 : 0.12, "highpass", 7500, A.music);
+    if (s % 2 === 0) tone("sawtooth", mf(BASS[bar] + (s === 6 || s === 14 ? 12 : 0)), t, 0.16, 0.16, A.music);
+    if (s in ARP || (light && s % 2 === 0)) {
+      const notes = PROG[bar]; const n = notes[(ARP[s] ?? (s / 2)) % 3] + 12;
+      tone("square", mf(n), t, 0.12, 0.05, A.music);
+    }
+  }
+  function sched() {
+    while (A.next < A.ctx.currentTime + 0.12) { playStep(A.step, A.next); A.next += 60 / A.tempo / 4; A.step = (A.step + 1) % 64; }
+  }
+  function music(mood) {
+    if (!A.ctx) return;
+    A.mood = mood;
+    if (mood === "off") { clearInterval(A.id); A.id = null; return; }
+    A.tempo = mood === "lightning" ? 150 : 124;
+    if (!A.id) { A.next = A.ctx.currentTime + 0.05; A.step = 0; A.id = setInterval(sched, 25); }
+  }
+  function duck(level) { if (A.ctx) A.music.gain.setTargetAtTime(level, A.ctx.currentTime, 0.15); }
+  const SFX = {
+    tick() { tone("square", 1700, A.ctx.currentTime, 0.04, 0.25); },
+    lock() { const t = A.ctx.currentTime; tone("square", 880, t, 0.05, 0.18); tone("square", 1320, t + 0.06, 0.06, 0.18); },
+    buzzer() { const t = A.ctx.currentTime; tone("sawtooth", 110, t, 0.6, 0.35); tone("sawtooth", 117, t, 0.6, 0.3); },
+    whoosh() { const t = A.ctx.currentTime, s = A.ctx.createBufferSource(), f = A.ctx.createBiquadFilter(), g = A.ctx.createGain();
+      s.buffer = A.noise; f.type = "bandpass"; f.Q.value = 1.2; f.frequency.setValueAtTime(300, t); f.frequency.exponentialRampToValueAtTime(4000, t + 0.5);
+      env(g, t, 0.15, 0.5, 0.4); s.connect(f); f.connect(g); g.connect(A.sfx); s.start(t); s.stop(t + 0.7); },
+    roll(dur) { const t0 = A.ctx.currentTime; let t = t0, gap = 0.07;
+      while (t < t0 + dur) { noise(t, 0.05, 0.12 + 0.35 * ((t - t0) / dur), "bandpass", 1500, A.sfx, 0.7); t += gap; gap = Math.max(0.03, gap * 0.96); }
+      noise(t0 + dur, 1.4, 0.45, "highpass", 5000); tone("sine", 120, t0 + dur, 0.4, 0.8, A.sfx, 50); },
+    correct() { const t = A.ctx.currentTime; [72, 76, 79, 84].forEach((m, i) => tone("triangle", mf(m), t + i * 0.09, 0.3, 0.3)); },
+    wrong() { tone("sine", 160, A.ctx.currentTime, 0.35, 0.5, A.sfx, 60); },
+    fanfare() { const t = A.ctx.currentTime; [[60, 64, 67], [60, 64, 67], [60, 64, 67], [65, 69, 72], [67, 71, 74], [72, 76, 79]].forEach((ch, i) => {
+      const at = t + [0, 0.16, 0.32, 0.5, 0.8, 1.1][i], d = i === 5 ? 1.4 : 0.14;
+      ch.forEach((m) => tone("sawtooth", mf(m), at, d, 0.09)); }); },
+    applause() { const t0 = A.ctx.currentTime; for (let i = 0; i < 260; i++) { const t = t0 + Math.random() * 3.2; noise(t, 0.03, 0.05 + Math.random() * 0.1 * (1 - (t - t0) / 4), "bandpass", 1000 + Math.random() * 2000, A.sfx, 1.5); } },
+  };
+  function sfx(name, arg) { if (A.ctx && !state.muted) try { SFX[name](arg); } catch (e) {} }
+
+  // ---------- confetti ----------
+  const cv = $("confetti"), cx = cv.getContext("2d");
+  let parts = [], cfId = null;
+  function confetti() {
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    cv.width = innerWidth * devicePixelRatio; cv.height = innerHeight * devicePixelRatio;
+    const cols = ["#e2382f", "#2477e0", "#f6c31c", "#22a35a", "#f7f4ec"];
+    for (let i = 0; i < 220; i++) parts.push({ x: Math.random() * cv.width, y: -Math.random() * cv.height * 0.6, w: 8 + Math.random() * 10, h: 6 + Math.random() * 6, vx: (Math.random() - 0.5) * 4, vy: 3 + Math.random() * 5, r: Math.random() * 6, vr: (Math.random() - 0.5) * 0.3, c: cols[i % 5] });
+    if (!cfId) loop();
+  }
+  function loop() {
+    cx.clearRect(0, 0, cv.width, cv.height);
+    parts.forEach((p) => { p.x += p.vx; p.y += p.vy; p.vy += 0.05; p.r += p.vr; cx.save(); cx.translate(p.x, p.y); cx.rotate(p.r); cx.fillStyle = p.c; cx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h); cx.restore(); });
+    parts = parts.filter((p) => p.y < cv.height + 40);
+    cfId = parts.length ? requestAnimationFrame(loop) : (cx.clearRect(0, 0, cv.width, cv.height), null);
+  }
+
+  // ---------- timer ----------
+  function startTimer() {
+    const q = Q[STEPS[state.step].i];
+    timer.dur = q.time; timer.left = q.time; timer.t0 = performance.now(); timer.lastTick = null;
+    clearInterval(timer.id);
+    timer.id = setInterval(() => {
+      timer.left = Math.max(0, timer.dur - (performance.now() - timer.t0) / 1000);
+      const sec = Math.ceil(timer.left);
+      if (sec <= 5 && sec > 0 && sec !== timer.lastTick) { timer.lastTick = sec; sfx("tick"); }
+      if (timer.left <= 0) { closeTimer(true); return; }
+      drawRing();
+    }, 100);
+  }
+  function closeTimer(buzz) {
+    clearInterval(timer.id); timer.id = null; timer.left = 0;
+    state.phase = "closed"; if (buzz) sfx("buzzer");
+    render();
+  }
+  function drawRing() {
+    const r = $("ring"); if (!r) return;
+    const C = 2 * Math.PI * 54, frac = timer.dur ? timer.left / timer.dur : 1;
+    r.querySelector(".bar").style.strokeDashoffset = String(C * (1 - frac));
+    r.querySelector(".num").textContent = state.phase === "timing" ? Math.ceil(timer.left) : (state.phase === "ask" ? Q[STEPS[state.step].i].time : (state.phase === "reveal" ? "✓" : "0"));
+    r.classList.toggle("hot", state.phase === "timing" && timer.left <= 5);
+  }
+
+  // ---------- phones (PeerJS relay; the game still runs by hand if this fails) ----------
+  const PHONE_URL = ""; // phone page link, used only when this file is opened from disk
+  const NET = { peer: null, code: "", conns: new Set(), status: "wait" };
+  const CODE_CH = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+  let qrImg = "";
+  function phoneBase() {
+    if (/^https?:$/.test(location.protocol)) return new URL(".", location.href).href;
+    let saved = ""; try { saved = localStorage.getItem("ceo4day-phone-url") || ""; } catch (e) {}
+    return saved || PHONE_URL;
+  }
+  function joinUrl() {
+    const b = phoneBase(); if (!b || !NET.code) return "";
+    try { const u = new URL(b); u.searchParams.set("room", NET.code); return u.href; } catch (e) { return ""; }
+  }
+  function qr() {
+    qrImg = ""; const url = joinUrl(), box = $("qrtmp"); if (!url || !window.QRCode) return;
+    box.innerHTML = "";
+    try { new QRCode(box, { text: url, width: 480, height: 480, correctLevel: QRCode.CorrectLevel.M }); const cv = box.querySelector("canvas"); qrImg = cv ? cv.toDataURL() : ""; } catch (e) {}
+  }
+  const phones = (team) => [...NET.conns].filter((c) => c.team === team).length;
+  function netChip() {
+    const n = NET.conns.size, el = $("netchip");
+    el.className = "netchip " + (NET.status === "ok" ? "ok" : NET.status === "bad" ? "bad" : "");
+    el.textContent = NET.status === "ok" ? `Join code ${NET.code} · ${n} phone${n === 1 ? "" : "s"}` : NET.status === "bad" ? "Phones offline · play by hand" : "Phones: connecting…";
+  }
+  function netInit() {
+    if (!window.Peer) { NET.status = "bad"; netChip(); return; }
+    NET.code = Array.from({ length: 4 }, () => CODE_CH[Math.floor(Math.random() * CODE_CH.length)]).join("");
+    try { NET.peer = new Peer("g5lob-ceo4day-" + NET.code.toLowerCase()); } catch (e) { NET.status = "bad"; netChip(); return; }
+    NET.status = "wait"; netChip();
+    NET.peer.on("open", () => { NET.status = "ok"; qr(); render(); });
+    NET.peer.on("error", (e) => {
+      if (e.type === "unavailable-id") { NET.peer.destroy(); setTimeout(netInit, 200); return; }
+      if (["network", "server-error", "socket-error", "browser-incompatible", "ssl-unavailable"].includes(e.type) && NET.status !== "ok") { NET.status = "bad"; render(); }
+    });
+    NET.peer.on("disconnected", () => { NET.status = "wait"; netChip(); setTimeout(() => { try { NET.peer.reconnect(); } catch (e) {} }, 1500); });
+    NET.peer.on("connection", (c) => {
+      c.on("open", () => { NET.conns.add(c); netChip(); c.send(snapshot(c.team)); });
+      c.on("data", (d) => onPhone(c, d));
+      const gone = () => { NET.conns.delete(c); renderTeams(); };
+      c.on("close", gone); c.on("error", gone);
+    });
+  }
+  function onPhone(c, d) {
+    if (!d || typeof d !== "object") return;
+    if (d.type === "hello" && TEAMS.some((t) => t.id === d.team)) { c.team = d.team; renderTeams(); c.send(snapshot(c.team)); return; }
+    if (d.type === "answer" && c.team) phoneAnswer(c.team, d.qi, d.o);
+  }
+  function phoneAnswer(team, qi, o) {
+    const st = STEPS[state.step];
+    if (st.s !== "q" || st.i !== qi || state.phase !== "timing") return;
+    if (!Number.isInteger(o) || o < 0 || o >= Q[qi].opts.length) return;
+    state.answers[qi] = state.answers[qi] || {};
+    if (state.answers[qi][team]) return; // first tap is final
+    undoStack.push(JSON.stringify(state.answers[qi]));
+    state.answers[qi][team] = { o, t: performance.now(), phone: true };
+    sfx("lock");
+    if (TEAMS.every((t) => state.answers[qi][t.id])) { sfx("whoosh"); closeTimer(false); } else render();
+  }
+  function snapshot(team) {
+    const st = STEPS[state.step], sc = scores(), vals = TEAMS.map((t) => sc[t.id]);
+    const out = { type: "state", kind: st.s, names: state.names, score: team ? sc[team] : 0, rank: team ? 1 + vals.filter((v) => v > sc[team]).length : 0 };
+    if (st.s === "q") {
+      const q = Q[st.i], mine = (state.answers[st.i] || {})[team];
+      Object.assign(out, { qi: st.i, head: headOf(q), q: q.q, opts: q.opts, lightning: !!q.lightning, phase: state.phase, left: state.phase === "timing" ? timer.left : 0, mine: mine ? mine.o : null });
+      if (state.phase === "reveal") { const d = delta(st.i); Object.assign(out, { correct: q.correct, got: team ? d[team].p : 0, first: team ? d[team].first : false }); }
+    }
+    return out;
+  }
+  function broadcast() { NET.conns.forEach((c) => { try { if (c.open) c.send(snapshot(c.team)); } catch (e) {} }); }
+  function headOf(q) { return q.lightning ? `Lightning ${Q.filter((x) => x.lightning).indexOf(q) + 1} of 4 · Double points` : `${q.round} · ${q.tag.split(" · ")[0]}`; }
+
+  // ---------- actions ----------
+  function enter(dir) {
+    const st = STEPS[state.step];
+    lastDelta = null; state.sel = null; undoStack = [];
+    clearInterval(timer.id); timer.id = null;
+    if (st.s === "q") { state.phase = state.revealed[st.i] ? "reveal" : "ask"; timer.left = 0; }
+    if (dir > 0) {
+      if (st.s === "teams") { music("main"); duck(0.55); }
+      if (st.s === "q") { duck(0.55); sfx("whoosh"); }
+      if (st.s === "lintro") { music("lightning"); duck(0.6); sfx("whoosh"); }
+      if (st.s === "podium") { duck(0.2); sfx("fanfare"); setTimeout(() => sfx("applause"), 900); confetti(); }
+      if (st.s === "bridge") { duck(0.0001); setTimeout(() => music("off"), 1500); }
+    }
+    if (dir < 0 && st.s !== "bridge" && st.s !== "start") { music(STEPS[state.step].s === "q" && Q[st.i]?.lightning || st.s === "lintro" ? "lightning" : "main"); duck(0.55); }
+    if (st.s === "q" && !Q[st.i].lightning && dir !== 0) music("main");
+    render();
+  }
+  function next() {
+    const st = STEPS[state.step];
+    if (st.s === "start") { audioInit(); }
+    if (st.s === "q") {
+      if (state.phase === "ask") { state.phase = "timing"; startTimer(); render(); return; }
+      if (state.phase === "timing") { closeTimer(true); return; }
+      if (state.phase === "closed") {
+        state.phase = "rolling"; duck(0.12); sfx("roll", 1.4); render();
+        setTimeout(() => {
+          state.revealed[st.i] = true; state.phase = "reveal";
+          lastDelta = delta(st.i);
+          const anyRight = TEAMS.some((t) => lastDelta[t.id].p > 0);
+          sfx(anyRight ? "correct" : "wrong"); if (anyRight) setTimeout(() => sfx("whoosh"), 250);
+          duck(0.3); render();
+        }, 1500);
+        return;
+      }
+      if (state.phase === "rolling") return;
+    }
+    if (state.step < STEPS.length - 1) { state.step++; enter(1); }
+  }
+  function back() {
+    const st = STEPS[state.step];
+    if (st.s === "q" && (state.phase === "timing" || state.phase === "closed")) { clearInterval(timer.id); timer.id = null; state.phase = "ask"; render(); return; }
+    if (st.s === "q" && state.phase === "reveal") { delete state.revealed[st.i]; state.phase = "closed"; lastDelta = null; render(); return; }
+    if (state.step > 0) { state.step--; enter(-1); }
+  }
+  function canAnswer() { const st = STEPS[state.step]; return st.s === "q" && ["ask", "timing", "closed"].includes(state.phase); }
+  function answer(team, o) {
+    if (!canAnswer()) return;
+    const qi = STEPS[state.step].i, q = Q[qi];
+    if (o < 0 || o >= q.opts.length) return;
+    state.answers[qi] = state.answers[qi] || {};
+    undoStack.push(JSON.stringify(state.answers[qi]));
+    const cur = state.answers[qi][team];
+    if (cur && cur.o === o) delete state.answers[qi][team];
+    else state.answers[qi][team] = { o, t: performance.now() };
+    state.sel = null; sfx("lock"); render();
+  }
+  function undo() {
+    if (!canAnswer() || !undoStack.length) return;
+    state.answers[STEPS[state.step].i] = JSON.parse(undoStack.pop()); render();
+  }
+  function skipLightning() {
+    const st = STEPS[state.step];
+    if (st.s === "lintro" || (st.s === "q" && Q[st.i].lightning)) { state.step = STEPS.findIndex((x) => x.s === "podium"); enter(1); }
+  }
+  function setMute(m) { state.muted = m; if (A.master) A.master.gain.setTargetAtTime(m ? 0 : state.vol, A.ctx.currentTime, 0.05); $("btnMute").textContent = m ? "Unmute" : "Mute"; }
+
+  // ---------- render ----------
+  function render() {
+    const st = STEPS[state.step];
+    const host = st.s === "q" ? Q[st.i].host : st.host;
+    $("progress").innerHTML = STEPS.map((x, k) => `<span class="pill ${k === state.step ? "on" : k < state.step ? "done" : ""}">${x.pill}</span>`).join("");
+    $("hostchip").innerHTML = `Host: <b>${host}</b>`;
+    const view = { start: vStart, teams: vTeams, q: vQ, lintro: vLintro, podium: vPodium, bridge: vBridge }[st.s];
+    const key = state.step + ":" + (state.phase === "reveal" ? "r" : "");
+    $("stage").innerHTML = `<div class="screen ${key !== lastKey ? "enter" : ""}">${view(st)}</div>`;
+    lastKey = key;
+    $("teams").hidden = st.s === "start" || st.s === "podium" || st.s === "bridge";
+    renderTeams();
+    renderConsole(st);
+    if (st.s === "q") drawRing();
+    if (st.s === "teams") {
+      TEAMS.forEach((t) => { const el = $("name-" + t.id); el.addEventListener("input", () => { state.names[t.id] = el.value.trim() || t.label + " Team"; renderTeams(); broadcast(); }); });
+      const pu = $("phoneurl");
+      if (pu) pu.addEventListener("change", () => { try { localStorage.setItem("ceo4day-phone-url", pu.value.trim()); } catch (e) {} qr(); render(); });
+    }
+    broadcast();
+  }
+  function renderTeams() {
+    const st = STEPS[state.step], sc = scores(), top = Math.max(...Object.values(sc));
+    const qi = st.s === "q" ? st.i : null, a = qi !== null ? state.answers[qi] || {} : {};
+    const order = Object.entries(a).sort((x, y) => x[1].t - y[1].t).map((e) => e[0]);
+    const open = canAnswer();
+    netChip();
+    $("teams").innerHTML = TEAMS.map((t) => {
+      const opts = qi !== null ? Q[qi].opts : [];
+      const labels = qi !== null && Q[qi].lightning ? opts.map((o) => o.toUpperCase()) : opts.map((_, k) => String(k + 1));
+      const btns = qi !== null ? `<div class="btns">${labels.map((l, k) => `<button type="button" data-team="${t.id}" data-o="${k}" class="${a[t.id] && a[t.id].o === k && (!a[t.id].phone || state.phase === "reveal") ? "on" : ""}" ${open ? "" : "disabled"} aria-label="${esc(state.names[t.id])} answers ${esc(l)}">${esc(l)}</button>`).join("")}</div>` : "";
+      const pos = order.indexOf(t.id), np = phones(t.id);
+      const ph = NET.status === "ok" ? `<span class="ph ${np ? "" : "off"}">${np ? "📱 " + np : "no phone"}</span>` : "";
+      const ord = pos >= 0 && state.phase !== "reveal" ? `<span class="order">Locked #${pos + 1}</span>` : "";
+      const d = lastDelta && lastDelta[t.id].p ? `<span class="delta">+${lastDelta[t.id].p}${lastDelta[t.id].first ? " FIRST!" : ""}</span>` : "";
+      const crown = top > 0 && sc[t.id] === top ? `<span class="crown" aria-label="Leader">👑</span>` : "";
+      return `<div class="team ${t.cls} ${state.sel === t.id ? "sel" : ""}" style="--c:${t.c}">${crown}${ord}${ph}${d}
+        <div class="row"><span class="nm">${esc(state.names[t.id])}</span><span class="sc">${sc[t.id]}</span></div>${btns}</div>`;
+    }).join("");
+  }
+  function renderConsole(st) {
+    let label = "Next ▸", say = "";
+    if (st.s === "start") { label = "Start the show ▸"; say = "<b>Before class:</b> connect the laptop sound to the room speakers and press Full screen."; }
+    if (st.s === "teams") { label = "Round 1 ▸"; say = "<b>Ahmad:</b> “It’s 2004. LEGO is almost out of cash. Split into four teams by where you sit. Every team is the new CEO. Spokespeople, scan the QR code and pick your colour.”"; }
+    if (st.s === "lintro") { label = "First statement ▸"; say = "<b>Hung:</b> “Lightning round! Double points. Is it LEGO or Nokia? Tap it on your phone.”"; }
+    if (st.s === "podium") { label = "Wrap up ▸"; say = "<b>Sandra:</b> “Give it up for our winning CEOs!”"; }
+    if (st.s === "bridge") { label = "Done"; say = "<b>Sandra → Ahmad:</b> close this window and go to slide 2."; }
+    if (st.s === "q") {
+      const q = Q[st.i];
+      say = q.ask;
+      label = { ask: `Start ${q.time}s timer ▸`, timing: "Stop timer ▸", closed: "Reveal answer ▸", rolling: "Revealing…", reveal: st.i === Q.length - 1 ? "Show podium ▸" : (st.i === 2 ? "Lightning round ▸" : "Next question ▸") }[state.phase];
+      if (state.phase === "reveal") say = `<b>${q.host}:</b> read the fact, then say the theory line.`;
+      if (state.phase === "closed") say = "<b>Time!</b> A team without a phone? Enter its answer by hand, then reveal.";
+      if (state.phase === "ask") say += " <b>Phones unlock when you start the timer.</b>";
+    }
+    $("btnNext").textContent = label;
+    $("btnNext").disabled = state.phase === "rolling" && st.s === "q" || st.s === "bridge";
+    $("btnBack").disabled = state.step === 0;
+    $("btnUndo").disabled = !canAnswer() || !undoStack.length;
+    $("say").innerHTML = say;
+  }
+
+  function vStart() {
+    return `<div class="eyebrow">Group 5 · LOB Session 9 · Icebreaker</div>
+      <h1 class="mega">CEO for a Day:<br><span class="y">The Brick Crisis</span></h1>
+      <p class="lede">It’s 2004. The world’s favourite toy company is almost out of cash. Four teams. Three CEO decisions. One lightning round. Who leads best?</p>
+      <div class="rules">
+        <div class="rule"><b>4 teams</b>Split the room by where you sit.</div>
+        <div class="rule"><b>📱 Tap</b>Each team’s spokesperson answers on their phone. First tap is final.</div>
+        <div class="rule"><b>+100</b>For every right answer. First right answer gets +50 more.</div>
+        <div class="rule"><b>×2</b>Lightning round: double points.</div>
+      </div>
+      <button class="big-btn" type="button" data-act="next">Start the show ▸</button>`;
+  }
+  function vTeams() {
+    return `<div class="eyebrow">The situation · LEGO, 2003–2005</div>
+      <h1 class="mega">You are the <span class="y">new CEO</span>.</h1>
+      <div class="stats">
+        <div class="stat"><b>US$300m</b>lost in 2003</div>
+        <div class="stat"><b>Almost</b>out of cash</div>
+        <div class="stat"><b>Too many</b>parks, games, jewelry, centers</div>
+      </div>
+      <div class="joinwrap"><div class="qcard">
+        <div class="namegrid">${TEAMS.map((t) => `<label style="--c:${t.c}" for="name-${t.id}">${t.label} team name<input id="name-${t.id}" type="text" maxlength="18" value="${esc(state.names[t.id])}"></label>`).join("")}</div>
+        ${/^https?:$/.test(location.protocol) ? "" : `<div class="urlrow"><label for="phoneurl">Phone page link</label><input id="phoneurl" type="url" placeholder="https://yourname.github.io/ceo4day/" value="${esc(phoneBase())}"></div>`}
+      </div>${joinCard()}</div>`;
+  }
+  function joinCard() {
+    const url = joinUrl();
+    if (NET.status === "ok" && url && qrImg) return `<div class="qrcard"><div class="msg">Spokespeople: scan, then pick your team colour</div><img src="${qrImg}" alt="QR code to join the game"><div class="code">${NET.code}</div><div class="url">${esc(url)}</div></div>`;
+    const msg = NET.status === "bad" ? "Phones are offline. Play by hand: fingers up, host enters answers." : NET.status === "ok" ? "Paste the phone page link on the left to show the QR code." : "Connecting phones…";
+    return `<div class="qrcard"><div class="msg">${msg}</div>${NET.status === "ok" ? `<div class="code">${NET.code}</div>` : ""}</div>`;
+  }
+  function vLintro() {
+    return `<div class="eyebrow">Round 4 · Lightning · Double points</div>
+      <h1 class="mega">LEGO <span class="y">or</span> Nokia?</h1>
+      <p class="lede">Four statements. Ten seconds each. Tap LEGO or NOKIA. One company used power through fear. The other asked its fans for ideas.</p>`;
+  }
+  function vQ(st) {
+    const q = Q[st.i], rev = state.phase === "reveal", a = state.answers[st.i] || {};
+    const opts = q.opts.map((o, k) => {
+      const who = TEAMS.filter((t) => a[t.id] && a[t.id].o === k).map((t) => `<i style="--c:${t.c}" title="${esc(state.names[t.id])}"></i>`).join("");
+      const cls = rev ? (k === q.correct ? "right" : "dim") : "";
+      return `<div class="opt ${cls}"><span class="n">${q.lightning ? (k + 1) : k + 1}</span><span>${esc(o)}</span><span class="who">${rev ? who : ""}</span></div>`;
+    }).join("");
+    const head = headOf(q);
+    const fact = rev ? `<div class="fact"><span class="tag">${esc(q.tag)}</span><div><p>${esc(q.fact)}</p><p>${esc(q.theory)}</p><small>Source: ${esc(q.src)}</small></div></div>` : "";
+    return `<div class="qwrap"><div class="qcard">
+        <div class="eyebrow">${esc(head)}</div>
+        <h2 class="qtext">${q.lightning ? "“" + esc(q.q) + "”" : esc(q.q)}</h2>
+        <div class="opts ${q.lightning ? "lightning-opts" : ""}">${opts}</div>
+      </div>
+      <div class="ring" id="ring"><svg viewBox="0 0 128 128" aria-hidden="true"><circle class="track" cx="64" cy="64" r="54"></circle><circle class="bar" cx="64" cy="64" r="54" stroke-dasharray="${(2 * Math.PI * 54).toFixed(2)}" stroke-dashoffset="0"></circle></svg><div class="num">${q.time}</div><div class="cap">${{ ask: "ready", timing: "seconds", closed: "time!", rolling: "…", reveal: "answer" }[state.phase]}</div></div>
+      </div>${fact}`;
+  }
+  function vPodium() {
+    const sc = scores();
+    const ranked = TEAMS.map((t) => ({ ...t, s: sc[t.id] })).sort((x, y) => y.s - x.s);
+    const placeOf = (i) => 1 + ranked.findIndex((r) => r.s === ranked[i].s);
+    const slot = (i, h) => { const r = ranked[i]; return `<div class="place"><div class="pn">${esc(state.names[r.id])}</div><div class="ps">${r.s}</div><div class="blk" style="--c:${r.c};height:${h}px">${placeOf(i)}</div></div>`; };
+    return `<div class="eyebrow" style="text-align:center">Final scores</div>
+      <h1 class="mega" style="text-align:center">Best <span class="y">CEOs</span></h1>
+      <div class="podium">${slot(1, 150)}${slot(0, 220)}${slot(2, 110)}</div>
+      <div class="also">${esc(state.names[ranked[3].id])}: ${ranked[3].s} points. Every CEO survives the crisis today.</div>`;
+  }
+  function vBridge() {
+    return `<div class="eyebrow">Now the theory</div>
+      <h1 class="mega">You made three <span class="y">CEO decisions</span>.</h1>
+      <p class="lede">LEGO made the same three choices in 2004. Today, three chapters explain why they worked.</p>
+      <div class="chips">
+        <div class="chip"><b>KA11</b>Decision making &amp; creativity · Ahmad</div>
+        <div class="chip"><b>KA12</b>Power, influence &amp; politics · Hung</div>
+        <div class="chip"><b>KA13</b>Leadership effectiveness · Sandra</div>
+      </div>`;
+  }
+
+  // ---------- events ----------
+  $("btnNext").addEventListener("click", next);
+  $("btnBack").addEventListener("click", back);
+  $("btnUndo").addEventListener("click", undo);
+  $("btnMute").addEventListener("click", () => setMute(!state.muted));
+  $("vol").addEventListener("input", (e) => { state.vol = +e.target.value; if (A.master && !state.muted) A.master.gain.setTargetAtTime(state.vol, A.ctx.currentTime, 0.05); });
+  $("btnFull").addEventListener("click", toggleFull);
+  function toggleFull() { try { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen().catch(() => {}); } catch (e) {} }
+  $("stage").addEventListener("click", (e) => { if (e.target.closest("[data-act=next]")) next(); });
+  $("teams").addEventListener("click", (e) => { const b = e.target.closest("button[data-team]"); if (b) answer(b.dataset.team, +b.dataset.o); });
+  document.addEventListener("keydown", (e) => {
+    if (e.target.tagName === "INPUT") return;
+    const k = e.key.toLowerCase();
+    if (k === " " || k === "arrowright" || k === "enter") { e.preventDefault(); next(); return; }
+    if (k === "arrowleft") { back(); return; }
+    if (k === "m") { setMute(!state.muted); return; }
+    if (k === "u") { undo(); return; }
+    if (k === "s") { skipLightning(); return; }
+    if (k === "f") { toggleFull(); return; }
+    const t = TEAMS.find((x) => x.key === k);
+    if (t && canAnswer()) { state.sel = state.sel === t.id ? null : t.id; renderTeams(); return; }
+    if (/^[1-3]$/.test(k) && state.sel) answer(state.sel, +k - 1);
+  });
+
+  // ---------- boot (keeps the game state if the page updates while open) ----------
+  function start(data) {
+    if (data && data.state) { state = { ...state, ...data.state }; if (state.phase === "timing" || state.phase === "rolling") state.phase = "closed"; }
+    if (window.claude?.hot?.snapshot) try { window.claude.hot.snapshot(() => ({ state })); } catch (e) {}
+    $("btnMute").textContent = state.muted ? "Unmute" : "Mute"; $("vol").value = state.vol;
+    render();
+    netInit();
+  }
+  window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+})();
+</script>
+
+</body></html>
